@@ -1,0 +1,105 @@
+# Sveltia CMS config. Docs: https://sveltiacms.app/en/docs
+# Only GitHub users with write access to the repo can sign in.
+backend:
+  name: github
+  repo: egesovuksu/zeynakaranlik-site
+  branch: main
+  # No base_url: GitHub sign-in goes through Netlify's OAuth provider
+  # (GitHub OAuth app installed under Netlify > Project configuration > Access & security > OAuth).
+  auth_methods: [oauth]
+  # The OAuth app is still registered on this Netlify project, whatever address the site is served from.
+  site_domain: zeynakaranlik.netlify.app
+
+site_url: https://zeynakaranlik.com
+display_url: https://zeynakaranlik.com
+media_folder: public/images/uploads
+public_folder: /images/uploads
+
+# Uploaded photos (e.g. Instagram images) are converted to WebP and resized automatically.
+media_libraries:
+  default:
+    config:
+      max_file_size: 15000000
+      slugify_filename: true
+      transformations:
+        raster_image:
+          format: webp
+          quality: 82
+          width: 1600
+          height: 1600
+
+collections:
+  - name: pages
+    label: Sayfalar
+    label_singular: Sayfa
+    folder: src/content/pages
+    extension: md
+    format: frontmatter
+    create: false
+    delete: false
+    fields:
+      - { name: title, label: Başlık, widget: string }
+      - { name: seoTitle, label: "Google başlığı (isteğe bağlı; boşsa Başlık kullanılır, en fazla 60 karakter)", widget: string, required: false }
+      - { name: description, label: "Kısa açıklama (Google'da görünür)", widget: text }
+      - { name: approved, label: "Onaylandı (TASLAK yazısını kaldırır)", widget: boolean, default: false }
+      - { name: body, label: Metin, widget: markdown }
+
+  - name: areas
+    label: Çalışma Alanları
+    label_singular: Çalışma Alanı
+    folder: src/content/areas
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [order, title]
+    fields:
+      - { name: title, label: Başlık, widget: string }
+      - { name: slug, label: "Sayfa adresi (ör. panik-atak)", widget: string, required: false }
+      - { name: seoTitle, label: "Google başlığı (isteğe bağlı; boşsa Başlık kullanılır, en fazla 60 karakter)", widget: string, required: false }
+      - { name: description, label: "Kısa açıklama (Google'da görünür)", widget: text }
+      - { name: order, label: "Sıra (küçük sayı önce)", widget: number, value_type: int, default: 100 }
+      - { name: approved, label: "Onaylandı (TASLAK yazısını kaldırır)", widget: boolean, default: false }
+      - { name: body, label: Metin, widget: markdown }
+
+  - name: blog
+    label: Blog
+    label_singular: Yazı
+    folder: src/content/blog
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [pubDate, title]
+    fields:
+      - { name: title, label: Başlık, widget: string }
+      - { name: slug, label: "Sayfa adresi (boş bırakılabilir)", widget: string, required: false }
+      - { name: seoTitle, label: "Google başlığı (isteğe bağlı; boşsa Başlık kullanılır, en fazla 60 karakter)", widget: string, required: false }
+      - { name: description, label: "Kısa açıklama (Google'da görünür)", widget: text }
+      - { name: pubDate, label: Tarih, widget: datetime, format: YYYY-MM-DD, time_format: false }
+      - { name: image, label: "Kapak görseli (isteğe bağlı)", widget: image, required: false }
+      - { name: imageAlt, label: "Görselin kısa açıklaması (görme engelliler için)", widget: string, required: false }
+      - { name: draft, label: "Yayınlanmasın (taslak olarak sakla)", widget: boolean, default: false }
+      - { name: approved, label: "Onaylandı (TASLAK yazısını kaldırır)", widget: boolean, default: false }
+      - { name: body, label: Metin, widget: markdown }
+
+  - name: instagram
+    label: Instagram'dan
+    label_singular: Instagram paylaşımı
+    description: "Instagram'da paylaştığınız bir gönderiyi siteye eklemek için: görseli yükleyin, kısa açıklamayı ve gönderinin linkini yazın."
+    folder: src/content/instagram
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{hour}}{{minute}}"
+    identifier_field: caption
+    summary: "{{date}} – {{caption}}"
+    sortable_fields: [date]
+    fields:
+      - { name: image, label: "Görsel (Instagram'daki fotoğraf ya da kapak)", widget: image }
+      - { name: imageAlt, label: "Görselin kısa açıklaması (görme engelliler için)", widget: string }
+      - { name: caption, label: "Kısa açıklama", widget: text, required: false }
+      - { name: postUrl, label: "Instagram gönderisinin linki", widget: string, required: false, pattern: ['^https://(www\.)?instagram\.com/', "Link https://www.instagram.com/ ile başlamalı"] }
+      - { name: isReel, label: "Bu bir video (Reels)", widget: boolean, default: false }
+      - { name: date, label: Tarih, widget: datetime, format: YYYY-MM-DD, time_format: false }
+      - { name: show, label: "Sitede göster", widget: boolean, default: true }
